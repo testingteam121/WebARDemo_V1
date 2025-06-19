@@ -96,7 +96,7 @@
       video = document.getElementById('video');
       video.autoplay = false;
       video.pause();
-      video.muted = true;
+     // video.muted = true;
 
       let texture = new THREE.VideoTexture(video);
       texture.minFilter = THREE.LinearFilter;
@@ -118,7 +118,7 @@
       // Marker visibility check
       if (markerRoot1.visible && !markerVisible) {
         markerVisible = true;
-        video.muted = false;
+       // video.muted = false;
         video.play();
       }
 
