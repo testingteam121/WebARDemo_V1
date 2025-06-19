@@ -120,6 +120,8 @@ let video = document.getElementById('video');
 // Play video when marker is found
 markerControls1.addEventListener('markerFound', function () {
 	if (video.paused) {
+		video.muted = false;
+
 		video.play();
 	}
 });
@@ -128,6 +130,8 @@ markerControls1.addEventListener('markerFound', function () {
 markerControls1.addEventListener('markerLost', function () {
 	if (!video.paused) {
 		video.pause();
+				video.muted = true;
+
 	}
 });
 
