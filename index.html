@@ -111,8 +111,26 @@ function initialize()
 	markerRoot1 = new THREE.Group();
 	scene.add(markerRoot1);
 	let markerControls1 = new THREEx.ArMarkerControls(arToolkitContext, markerRoot1, {
-		type: 'pattern', patternUrl: "data/hiro.patt",
-	})
+	type: 'pattern',
+	patternUrl: "data/hiro.patt",
+});
+
+let video = document.getElementById('video');
+
+// Play video when marker is found
+markerControls1.addEventListener('markerFound', function () {
+	if (video.paused) {
+		video.play();
+	}
+});
+
+// Pause video when marker is lost
+markerControls1.addEventListener('markerLost', function () {
+	if (!video.paused) {
+		video.pause();
+	}
+});
+
 
 	let geometry1 = new THREE.PlaneBufferGeometry(2,2, 4,4);
 
