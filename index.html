@@ -33,6 +33,7 @@ var video;
 
 initialize();
 animate();
+	let markerVisible = false; // global variable
 
 function initialize() {
 	scene = new THREE.Scene();
@@ -111,25 +112,32 @@ function initialize() {
 	mesh1.rotation.x = -Math.PI / 2;
 	markerRoot1.add(mesh1);
 
-	// Play/pause logic on marker events
-	markerControls1.addEventListener('markerFound', function () {
-		if (video.paused) {
-			video.muted = false;
-			video.play();
-		}
-	});
-
-	markerControls1.addEventListener('markerLost', function () {
-		if (!video.paused) {
-			video.pause();
-			video.muted = true;
-		}
-	});
+	
 }
 
 function update() {
 	if (arToolkitSource.ready !== false)
 		arToolkitContext.update(arToolkitSource.domElement);
+
+
+function update() {
+	if (arToolkitSource.ready !== false)
+		arToolkitContext.update(arToolkitSource.domElement);
+
+	// Check marker visibility and control video
+	if (markerRoot1.visible && !markerVisible) {
+		// Marker just appeared
+		markerVisible = true;
+		video.muted = false;
+		video.play();
+	}
+	if (!markerRoot1.visible && markerVisible) {
+		// Marker just disappeared
+		markerVisible = false;
+		video.pause();
+		video.muted = true;
+	}
+}
 }
 
 function render() {
