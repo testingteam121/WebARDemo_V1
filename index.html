@@ -20,6 +20,10 @@
 
 <body style="margin:0; overflow:hidden; font-family:Monospace;">
 
+  <button id="startButton" style="position:absolute;top:20px;left:20px;z-index:9999;padding:10px 20px;font-size:16px;">
+    Start AR Experience
+  </button>
+
   <video id="video" loop playsinline style="display:none">
     <source src="video/sintel.ogv" type='video/ogg; codecs="theora, vorbis"'>
     <source src="video/sintel.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
@@ -31,6 +35,15 @@
     let markerRoot1, mesh1;
     let video;
     let markerVisible = false;
+    let userInteracted = false;
+
+    document.getElementById('startButton').addEventListener('click', function () {
+      userInteracted = true;
+      video.play().then(() => {
+        video.pause(); // Pause immediately to allow future audio play
+      });
+      this.style.display = 'none';
+    });
 
     initialize();
     animate();
@@ -56,7 +69,6 @@
       deltaTime = 0;
       totalTime = 0;
 
-      // Setup AR source
       arToolkitSource = new THREEx.ArToolkitSource({ sourceType: 'webcam' });
 
       function onResize() {
@@ -67,36 +79,30 @@
         }
       }
 
-      arToolkitSource.init(function onReady() {
-        onResize();
-      });
+      arToolkitSource.init(() => onResize());
+      window.addEventListener('resize', () => onResize());
 
-      window.addEventListener('resize', onResize);
-
-      // Setup AR context
       arToolkitContext = new THREEx.ArToolkitContext({
         cameraParametersUrl: 'data/camera_para.dat',
         detectionMode: 'mono'
       });
 
-      arToolkitContext.init(function () {
+      arToolkitContext.init(() => {
         camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix());
       });
 
-      // Marker setup
       markerRoot1 = new THREE.Group();
       scene.add(markerRoot1);
 
-      let markerControls1 = new THREEx.ArMarkerControls(arToolkitContext, markerRoot1, {
+      new THREEx.ArMarkerControls(arToolkitContext, markerRoot1, {
         type: 'pattern',
         patternUrl: 'data/hiro.patt'
       });
 
-      // Video setup
       video = document.getElementById('video');
       video.autoplay = false;
       video.pause();
-     // video.muted = true;
+      video.muted = true;
 
       let texture = new THREE.VideoTexture(video);
       texture.minFilter = THREE.LinearFilter;
@@ -115,10 +121,9 @@
       if (arToolkitSource.ready !== false)
         arToolkitContext.update(arToolkitSource.domElement);
 
-      // Marker visibility check
-      if (markerRoot1.visible && !markerVisible) {
+      if (markerRoot1.visible && !markerVisible && userInteracted) {
         markerVisible = true;
-       // video.muted = false;
+        video.muted = false;
         video.play();
       }
 
